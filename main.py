@@ -9,7 +9,7 @@ def main():
 
     else:
         basename = sys.argv[1]
-        parser = Parser(f'{basename}.asm')
+        parser = Parser(f'examples/{basename}.asm')
         coder = Code()
         symbol_table = SymbolTable()
 
@@ -55,5 +55,9 @@ def main():
 
                 machine_instructions.append(machine_instruction)
 
-        with open(f'{basename}.hack', 'w') as file:
+        with open(f'examples/{basename}.hack', 'w') as file:
             file.write('\n'.join(machine_instructions))  
+
+    
+if __name__ == '__main__':
+    main()
