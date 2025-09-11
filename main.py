@@ -2,14 +2,28 @@ from src.parser import Parser
 from src.code import Code
 from src.symbol_table import SymbolTable
 import sys
+import os
 
-def main():
-    if len(sys.argv) != 2:
-        print('provide one argument containing basename of file')
+def print_usage():
+    print('Usage: python main.py <basename>')
 
+def validate_file(filepath):
+    if not os.path.exists(filepath):
+        print(f'{filepath} not found')
+        return False
     else:
-        basename = sys.argv[1]
-        parser = Parser(f'examples/{basename}.asm')
+        return True
+    
+def assemble_file(basename):
+    input_file = f'examples/{basename}.asm'
+    output_file = f'examples/{basename}.hack'
+
+    if not validate_file(input_file):
+        return False
+    
+    try:
+        # Initialize components
+        parser = Parser(input_file)
         coder = Code()
         symbol_table = SymbolTable()
 
@@ -40,24 +54,44 @@ def main():
                 machine_instructions.append(machine_instruction)
 
             elif parser.command_type() == 'A_COMMAND':
-                if parser.symbol().isnumeric():
-                    decimal_value = parser.symbol()
+                symbol = parser.symbol()
+
+                if symbol.isnumeric():
+                    decimal_value = symbol
                 else:
-                    if symbol_table.contains(parser.symbol()):
-                        decimal_value = symbol_table.get_address(parser.symbol())
+                    if symbol_table.contains(symbol):
+                        decimal_value = symbol_table.get_address(symbol)
                     else:
-                        symbol_table.add_entry(parser.symbol(), memory_idx)
+                        symbol_table.add_entry(symbol, memory_idx)
                         decimal_value = memory_idx
                         memory_idx += 1
 
                 binary_value = format(int(decimal_value), '015b')
                 machine_instruction = f'0{binary_value}'    # 0 = opcode, 15-bit address
-
                 machine_instructions.append(machine_instruction)
 
-        with open(f'examples/{basename}.hack', 'w') as file:
+        with open(output_file, 'w') as file:
             file.write('\n'.join(machine_instructions))  
+        
+        print('Parsing successful')
 
+        return True
+    
+    except Exception as e:
+        print(f'Error during parsing: {e}')
+
+        return False
+
+def main():
+    if len(sys.argv) != 2:
+        print('provide one argument containing basename of file')
+        print_usage()
+        sys.exit(1)     # Return code so we can trace error
+
+    basename = sys.argv[1]
+
+    if not assemble_file(basename):
+        sys.exit(1)
     
 if __name__ == '__main__':
     main()
