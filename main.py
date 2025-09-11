@@ -86,7 +86,7 @@ def main():
     if len(sys.argv) != 2:
         print('provide one argument containing basename of file')
         print_usage()
-        sys.exit(1)     # Return code so we can trace error
+        sys.exit(1)     # Terminate with non-zero code to signal error
 
     basename = sys.argv[1]
 
