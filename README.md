@@ -5,4 +5,4 @@ It translates `.asm` files into `.hack` machine code files.
 
 ## Usage
 ```bash
-python3 main.py <basename>
+python3 main.py basename
